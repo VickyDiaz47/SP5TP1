@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar País</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Editar País</h1>
+
+  <div class="form-container">
+    <form action="/paises/<%= pais._id %>?_method=PUT" method="POST">
+      <input type="hidden" name="_method" value="PUT" />
+
+      <label for="imagen">URL de la Imagen</label>
+      <input type="text" id="imagen" name="imagen" value="<%= pais.imagen || '' %>" />
+
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" value="<%= pais.nombre %>" required />
+
+      <label for="nombreOficial">Nombre Oficial</label>
+      <input type="text" id="nombreOficial" name="nombreOficial" value="<%= pais.nombreOficial %>" required />
+
+      <label for="capital">Capital</label>
+      <input type="text" id="capital" name="capital" value="<%= pais.capital %>" required />
+
+      <label for="idioma">Idioma</label>
+      <input type="text" id="idioma" name="idioma" value="<%= pais.idioma %>" />
+
+      <label for="borders">Países limítrofes (separados por coma)</label>
+      <textarea id="borders" name="borders" rows="2"><%= pais.borders ? pais.borders.join(', ') : '' %></textarea>
+
+      <label for="area">Área (km²)</label>
+      <input type="number" id="area" name="area" value="<%= pais.area %>" required />
+
+      <label for="population">Población</label>
+      <input type="number" id="population" name="population" value="<%= pais.population %>" required />
+
+      <label for="gini">Índice GINI</label>
+      <input type="number" step="0.01" id="gini" name="gini" value="<%= pais.gini || '' %>" />
+
+      <label for="timezones">Zona horaria</label>
+<select id="timezones" name="timezones" required>
+  <option value="<%= pais.timezones %>" selected><%= pais.timezones %></option>
+</select>
+
+<script>
+  fetch("/api/timezones")
+    .then(res => res.json())
+    .then(zonas => {
+      const select = document.getElementById("timezones");
+      zonas.forEach(z => {
+        const opt = document.createElement("option");
+        opt.value = z;
+        opt.textContent = z;
+        // No duplicamos el que ya está seleccionado
+        if (z !== "<%= pais.timezones %>") {
+          select.appendChild(opt);
+        }
+      });
+    })
+    .catch(err => console.error("Error cargando zonas horarias:", err));
+</script>
+
+
+      <label for="creador">Creador</label>
+      <input type="text" id="creador" name="creador" value="<%= pais.creador %>" readonly />
+
+      <div class="card-buttons" style="text-align: center; margin-top: 20px;">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/dashboard" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

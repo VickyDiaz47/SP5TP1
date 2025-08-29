@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Error de Validación</title>
+</head>
+<body>
+  <h1>Errores en los datos enviados:</h1>
+  <ul>
+    <% errores.forEach(function(error) { %>
+      <li><%= error %></li>
+    <% }) %>
+  </ul>
+  <a href="javascript:history.back()">Volver</a>
+</body>
+</html>

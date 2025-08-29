@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Superhéroes</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <% if (typeof eliminado !== 'undefined') { %>
+      <div id="mensajeExito"> Pais "<%= eliminado %>" eliminado con éxito.</div>
+    <% } %>
+    
+    
+    <div class="contenedor-btn">
+      <h1>Lista de Paises</h1>
+    </div>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Buscar pais por nombre..." />
+    </div>
+
+    <% if (paises.length === 0) { %>
+      <p>No hay paises cargados.</p>
+    <% } else { %>
+      <div class="grid">
+  <% paises.forEach(pais => { %>
+    <div class="card pais-card"> <!-- Clase agregada: pais-card -->
+
+      <% if (pais.imagen) { %>
+        <img src="<%= pais.imagen %>" alt="Imagen de <%= pais.nombrePais %>" class="img-pais">
+      <% } %>
+
+      <h2 class="pais-name"><%= pais.nombre %></h2> <!-- Clase agregada: pais-name -->
+      <p><strong>Nombre:</strong> <%= pais.nombre %></p>
+      <p><strong>Nombre Oficial:</strong> <%= pais.nombreOficial%></p>
+      <p><strong>Capital:</strong> <%= pais.capital %></p>
+      <p><strong>Idioma:</strong> <%= pais.idioma %></p>
+      <p><strong>Paises limitrofes:</strong> <%= pais.borders.join(', ') %></p>
+      <p><strong>Area:</strong> <%= pais.area %> km²</p>
+      <p><strong>Población:</strong> <%= pais.population %></p>
+      <p><strong>Gini:</strong> <%= pais.gini %></p>
+      <p><strong>Zona Horaria:</strong> <%= pais.timezones %></p>
+      <p><strong>Creador:</strong> <%= pais.creador %></p>
+
+      <div class="card-buttons">
+        <a href="/paises/editar/<%= pais._id %>" class="btn btn-primary">Editar</a>
+        <button class="btn btn-danger" onclick="confirmarEliminacion('<%= pais._id %>', '<%= pais.nombrePais %>')">Eliminar</button>
+      </div>
+    </div>
+  <% }) %>
+</div>
+    <% } %>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalConfirmacion" class="modal">
+    <div class="modal-content">
+      <p id="mensajeConfirmacion">¿Estás seguro de que deseas eliminar a este pais?</p>
+      <form id="formEliminar" method="POST">
+        <input type="hidden" name="_method" value="DELETE" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function confirmarEliminacion(id, nombre) {
+      document.getElementById('mensajeConfirmacion').innerText =
+        `¿Estás seguro de que deseas eliminar a ${nombre}?`;
+      document.getElementById('formEliminar').action = `/paises/${id}?_method=DELETE`;
+      document.getElementById('modalConfirmacion').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+      document.getElementById('modalConfirmacion').style.display = 'none';
+    }
+
+    // Ocultar modal si se hace clic fuera
+    window.onclick = function (event) {
+      const modal = document.getElementById('modalConfirmacion');
+      if (event.target === modal) {
+        cerrarModal();
+      }
+    };
+
+    // Mensaje de éxito tras eliminación
+    document.addEventListener('DOMContentLoaded', () => {
+      const mensaje = document.getElementById('mensajeExito');
+      if (mensaje) {
+        mensaje.style.display = 'block';
+        setTimeout(() => {
+          mensaje.style.display = 'none';
+
+          // Limpiar el parámetro "eliminado" de la URL sin recargar
+      const url = new URL(window.location);
+      url.searchParams.delete('eliminado');
+      window.history.replaceState({}, document.title, url);
+        }, 2000);
+      }
+    });
+  </script>
+
+
+ <!-- script para busqueda -->
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchInput');
+  const cards = document.querySelectorAll('.pais-card');
+  const grid = document.querySelector('.grid');
+
+  searchInput.addEventListener('input', () => {
+    const filter = searchInput.value.trim().toLowerCase();
+    let hayCoincidencias = false;
+
+    cards.forEach(card => {
+      const name = card.querySelector('.pais-name').textContent.toLowerCase();
+      if (name.includes(filter)) {
+        card.classList.remove('hidden');
+        hayCoincidencias = true;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    // Mostrar mensaje si no hay coincidencias
+    let mensaje = document.getElementById('noResults');
+    if (!hayCoincidencias) {
+      if (!mensaje) {
+        mensaje = document.createElement('p');
+        mensaje.id = 'noResults';
+        mensaje.textContent = 'No se encontraron paises.';
+        mensaje.style.color = '#fff';
+        mensaje.style.textAlign = 'center';
+        grid.parentNode.insertBefore(mensaje, grid.nextSibling);
+      }
+    } else {
+      if (mensaje) mensaje.remove();
+    }
+  });
+});
+</script>
+</body>
+</html>

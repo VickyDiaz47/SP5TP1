@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agregar País</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Agregar Nuevo País</h1>
+  <div class="form-container">
+    <form action="/paises" method="POST">
+
+      <label for="imagen">URL de la Imagen</label>
+      <input type="text" name="imagen" id="imagen" placeholder="https://ejemplo.com/pais.jpg" />
+
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" placeholder="(ej: Argentina)" required />
+
+      <label for="nombreOficial">Nombre Oficial</label>
+      <input type="text" id="nombreOficial" name="nombreOficial" placeholder="(ej: República Argentina)" required />
+
+      <label for="capital">Capital</label>
+      <input type="text" id="capital" name="capital" required />
+
+      <label for="idioma">Idioma</label>
+      <input type="text" id="idioma" name="idioma" placeholder="(ej: Español, Inglés)" required />
+
+      <label for="borders">Países limítrofes (separados por coma)</label>
+      <textarea id="borders" name="borders" rows="2"></textarea>
+
+      <label for="area">Área (km²)</label>
+      <input type="number" id="area" name="area" placeholder="sin puntos" required />
+
+      <label for="population">Población</label>
+      <input type="number" id="population" name="population" placeholder="sin puntos" required />
+
+      <label for="gini">Índice GINI (0 al 1)</label>
+      <input type="number" step="0.01" id="gini" name="gini" placeholder="0,4"/>
+
+      <label for="timezones">Zona horaria</label>
+      <select id="timezones" name="timezones" required>
+        <option value="">Seleccione una zona horaria</option>
+      </select>
+      
+      <script>
+        // Cargar dinámicamente las zonas horarias desde tu backend
+        fetch("/api/timezones")
+          .then(res => res.json())
+          .then(zonas => {
+            const select = document.getElementById("timezones");
+            zonas.forEach(z => {
+              const opt = document.createElement("option");
+              opt.value = z;
+              opt.textContent = z;
+              select.appendChild(opt);
+            });
+          })
+          .catch(err => console.error("Error cargando zonas horarias:", err));
+      </script>
+
+      <!-- Creador oculto, siempre Virginia -->
+      <input type="hidden" name="creador" value="VirginiaD." />
+
+      <div class="card-buttons" style="text-align: center; margin-top: 20px;">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/dashboard" class="btn btn-danger">Cancelar</a>
+      </div>
+
+    </form>
+  </div>
+</body>
+</html>
