@@ -38,4 +38,14 @@ router.put('/paises/:id', actualizarPaisController);
 // Eliminar (DELETE vía method-override)
 router.delete('/paises/:id', eliminarPaisController);
 
+router.get("/contacto", (req, res) => {
+  res.render("contacto");
+});
+
+router.post("/contacto", (req, res) => {
+  // Por ahora solo simulamos el envío
+  console.log("📩 Nuevo mensaje:", req.body);
+  res.render("contacto", { mensaje: "¡Gracias por contactarnos! Te responderemos pronto." });
+});
+
 export default router;

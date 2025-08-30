@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Contáctanos</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Contáctanos</h1>
+    <p>Si tienes dudas, sugerencias o problemas, completa el formulario:</p>
+
+    <div class="container">
+  <h1>Contáctanos</h1>
+  <% if (typeof mensaje !== "undefined") { %>
+    <div id="mensajeExito"><%= mensaje %></div>
+  <% } else { %>
+    <p>Si tienes dudas, sugerencias o problemas, completa el formulario:</p>
+  <% } %>
+
+
+    <div class="form-container">
+      <form action="/contacto" method="POST">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="mensaje">Mensaje</label>
+        <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+
+        <div class="card-buttons" style="text-align: center; margin-top: 20px;">
+          <button type="submit" class="btn btn-primary">Enviar</button>
+          <a href="/dashboard" class="btn btn-danger">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

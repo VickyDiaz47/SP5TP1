@@ -9,11 +9,12 @@ import {
   eliminarPaisPorNombre
 } from '../services/paisesService.mjs';
 
-
 import {
   renderizarPais,
   renderizarListaPaises
 } from '../views/responseView.mjs';
+
+import { obtenerGini } from '../services/worldBank.mjs';
 
 export const getDashboard = async (req, res) => {
   const superPaises = await pais.find();
@@ -143,62 +144,67 @@ export async function obtenerPaisesHispanohablantesController(req, res) {
 
 export async function crearPaisController(req, res) {
   try {
+    const { codigoISO, gini: giniIngresado } = req.body;
+
+    let gini = giniIngresado || null;
+
+    // Buscar GINI automático solo si no lo puso el usuario
+    if (!gini) {
+      try {
+        gini = await obtenerGini(codigoISO);
+      } catch (error) {
+        console.warn("No se pudo obtener GINI para:", codigoISO, error.message);
+        gini = null;
+      }
+    }
+
     const nuevoPais = await crearPais({
       ...req.body,
-      creador: "VirginiaD."   // 👈 se agrega siempre
+      gini,
+      creador: "VirginiaD."  // tu marca personal
     });
-    const esAPI = req.originalUrl.startsWith('/api');
 
+    const esAPI = req.originalUrl.startsWith("/api");
     if (esAPI) {
       return res.status(201).json(renderizarPais(nuevoPais));
     }
 
-    res.redirect('/dashboard');
+    res.redirect("/dashboard");
   } catch (error) {
-    const esAPI = req.originalUrl.startsWith('/api');
-
-    if (esAPI) {
-      return res.status(400).json({
-        mensaje: 'Error al crear el país',
-        error: error.message
-      });
-    }
-
-    res.status(500).send('Error al crear el país');
+    console.error("❌ Error al crear el país:", error.message);
+    res.status(500).send("Error al crear el país");
   }
 }
 
 export async function actualizarPaisController(req, res) {
   try {
     const { id } = req.params;
-    const datosActualizados = req.body;
-    const paisActualizado = await actualizarPais(id, datosActualizados);
+    const { codigoISO } = req.body;
+
+    // Igual que en creación, siempre reintenta buscar GINI
+    let gini = null;
+    try {
+      gini = await obtenerGini(codigoISO);
+    } catch (error) {
+      console.warn("No se pudo actualizar GINI para:", codigoISO, error.message);
+    }
+
+    const paisActualizado = await actualizarPais(id, {
+      ...req.body,
+      gini
+    });
 
     if (!paisActualizado) {
-      return res.status(404).json({ mensaje: 'País no encontrado' });
+      return res.status(404).send("País no encontrado");
     }
 
-    const esAPI = req.originalUrl.startsWith('/api');
-
-    if (esAPI) {
-      const todosLosPaises = await obtenerTodosLosPaises();
-      return res.status(200).json(renderizarListaPaises(todosLosPaises));
-    }
-
-    res.redirect('/dashboard');
+    res.redirect("/dashboard");
   } catch (error) {
-    const esAPI = req.originalUrl.startsWith('/api');
-
-    if (esAPI) {
-      return res.status(500).json({
-        mensaje: 'Error al actualizar el país',
-        error: error.message
-      });
-    }
-
-    res.status(500).send('Error al actualizar el país');
+    res.status(500).send("Error al actualizar el país");
   }
 }
+
+
 
 export async function eliminarPaisController(req, res) {
   try {

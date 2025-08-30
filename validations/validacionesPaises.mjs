@@ -25,9 +25,14 @@ export const validarPais = [
     .isNumeric().isInt().withMessage('La población debe ser un número')
     .custom(value => Number(value) >= 0).withMessage('La población no puede ser negativa'),
 
+  body('codigoISO')
+    .notEmpty().withMessage('El código ISO es obligatorio')
+    .isLength({ min: 2, max: 3 }).withMessage('El código ISO debe tener 3 letras')
+    .isAlpha().withMessage('El código ISO debe contener solo letras'),
+
   body('gini')
     .optional()
-    .isFloat({ min: 0, max: 1 }).withMessage('El índice GINI debe estar entre 0 y 1'),
+    .isFloat({ min: 0, max: 100 }).withMessage('El índice GINI debe estar entre 0 y 100'),
 
   body('borders')
     .optional()

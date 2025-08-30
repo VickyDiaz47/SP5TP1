@@ -34,29 +34,44 @@
       <label for="population">Población</label>
       <input type="number" id="population" name="population" placeholder="sin puntos" required />
 
-      <label for="gini">Índice GINI (0 al 1)</label>
-      <input type="number" step="0.01" id="gini" name="gini" placeholder="0,4"/>
+      <label for="codigoISO">Código ISO (ej: ARG, BRA, USA)</label>
+      <input type="text" id="codigoISO" name="codigoISO" placeholder="Ingrese el código ISO del país" required maxlength="3" style="text-transform:uppercase;" />
 
       <label for="timezones">Zona horaria</label>
       <select id="timezones" name="timezones" required>
-        <option value="">Seleccione una zona horaria</option>
+        <option value="">Cargando zonas horarias...</option>
       </select>
       
       <script>
-        // Cargar dinámicamente las zonas horarias desde tu backend
-        fetch("/api/timezones")
-          .then(res => res.json())
-          .then(zonas => {
-            const select = document.getElementById("timezones");
-            zonas.forEach(z => {
-              const opt = document.createElement("option");
-              opt.value = z;
-              opt.textContent = z;
-              select.appendChild(opt);
-            });
-          })
-          .catch(err => console.error("Error cargando zonas horarias:", err));
-      </script>
+    async function cargarZonasHorarias() {
+      try {
+        const res = await fetch("/api/timezones"); // 👈 tu ruta Express
+        if (!res.ok) throw new Error("Error HTTP " + res.status);
+        const zonas = await res.json();
+
+        const select = document.getElementById("timezones");
+        select.innerHTML = ""; // limpio el "cargando"
+
+        if (zonas.length === 0) {
+          select.innerHTML = '<option value="">No disponible</option>';
+          return;
+        }
+
+        zonas.forEach(z => {
+          const opt = document.createElement("option");
+          opt.value = z;
+          opt.textContent = z;
+          select.appendChild(opt);
+        });
+      } catch (error) {
+        console.error("❌ Error cargando zonas horarias:", error.message);
+        const select = document.getElementById("timezones");
+        select.innerHTML = '<option value="">No disponible</option>';
+      }
+    }
+
+    cargarZonasHorarias();
+  </script>
 
       <!-- Creador oculto, siempre Virginia -->
       <input type="hidden" name="creador" value="VirginiaD." />

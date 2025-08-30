@@ -11,7 +11,8 @@ const paisSchema = new mongoose.Schema({
   borders: [String],
   area: { type: Number, min: 0 },
   population: { type: Number, min: 0 },
-  gini: { type: Number, min: 0, max: 1 },
+  gini: { type: Number, min: 0, max: 100, default: null },
+  codigoISO: { type: String, required: true, uppercase: true, minlength: 2, maxlength: 3 },
   timezones: { type: String, required: true },
   creador: { type: String, default: 'VirginiaD.' },
   createdAt: { type: Date, default: Date.now }
